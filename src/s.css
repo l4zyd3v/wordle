@@ -1,0 +1,92 @@
+@font-face {
+  font-family: protoNerdFont;
+  src: url(./fonts/0xProtoNerdFont-Regular.ttf);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#app {
+  height: 100vh;
+  background: #142b3b;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+@keyframes heading-shadow-anim {
+  from {
+    opacity: 0;
+    text-shadow: 0px 0px 0px black;
+  }
+
+  to {
+    opacity: 1;
+    text-shadow: 7px 4px 4px black;
+  }
+}
+
+.heading1 {
+  animation: heading-shadow-anim 1s forwards;
+  color: lightcoral;
+  font-size: 2rem;
+  margin-bottom: -0.5rem;
+  font-family: protoNerdFont;
+}
+
+.game-board {
+  display: grid;
+  box-shadow: 1px 1px 28px 12px black;
+  border-radius: 5px;
+  border: 5px solid black;
+}
+
+.row {
+  display: grid;
+  justify-content: center;
+}
+
+@keyframes letter-block-anim {
+  from {
+    opacity: 0;
+    background-color: red;
+    transform: scale(0.5);
+  }
+
+  to {
+    opacity: 1;
+    background-color: #aea4ba;
+    transform: scale(1);
+  }
+}
+
+.letter-block-row {
+  animation: letter-block-anim 1.5s forwards;
+  font-size: 2.1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.4rem;
+  box-shadow: 3px 2px 8px -2px black;
+  border-radius: 15%;
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+}
+
+.hidden {
+  transition: 1s;
+  opacity: 0;
+}
+
+.correct {
+  background: green !important;
+}
+
+.incorrect {
+  background: red !important;
+}
