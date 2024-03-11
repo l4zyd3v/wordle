@@ -6,7 +6,19 @@ const numberOfLetters = 5;
 const rowStartduration = 70;
 const letterBlockStartduration = 80;
 
-var secretWord = ["h", "e", "l", "l", "o"];
+interface SecretWord {
+  letter: string;
+  answer: "correct" | "wrong" | "almost" | false;
+}
+
+// answer can either be: correct, wrong, almost.
+var secretWord: SecretWord[] = [
+  { letter: "h", answer: false },
+  { letter: "e", answer: false },
+  { letter: "l", answer: false },
+  { letter: "l", answer: false },
+  { letter: "o", answer: false },
+];
 
 // helper functions
 function wait(ms: number) {
@@ -96,62 +108,125 @@ function addLetterBlocksToRow(row: HTMLDivElement, numberOfLetters: number) {
         listenToInput(letterBlock, i);
       });
   }
-
-  function disableAllLetterBlocksBesidesFirstOneAndFocus(
-    letterBlock: HTMLInputElement,
-    row: HTMLDivElement,
-    letterBlockNumber: number,
-  ) {
-    letterBlock.disabled = true;
-
-    if (row.classList.contains("row-1") && letterBlockNumber === 1) {
-      letterBlock.disabled = false;
-      console.log(letterBlock);
-
-      letterBlock.focus();
-    }
-  }
 }
 
-function listenToInput(
+function disableAllLetterBlocksBesidesFirstOneAndFocus(
   letterBlock: HTMLInputElement,
-  i: number,
-  secretWord: string[],
+  row: HTMLDivElement,
+  letterBlockNumber: number,
 ) {
+  letterBlock.disabled = true;
+
+  // enable the absolute first letter block, and focus it
+  if (row.classList.contains("row-1") && letterBlockNumber === 1) {
+    letterBlock.disabled = false;
+
+    letterBlock.focus();
+  }
+}
+// ----------------------------------------------------------
+function listenToInput(letterBlock: HTMLInputElement, i: number) {
   letterBlock.addEventListener("input", (e) => {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    const index = i + 1;
+    const currentLetterIndex = i;
+    const nextInput = target.nextElementSibling as HTMLInputElement;
 
     // test if the input is a letter otherwise return
     if (!/^[a-zA-Z]*$/.test(value)) {
       target.value = "";
       return;
     }
-    // evaluateInput(target, value, index, secretWord);
-    if (value === secretWord[index]) {
-      target.classList.add("correct");
-      target.disabled = true;
-    }
-    // if (value !== secretWord[index]) {
-    //   target.classList.add("incorrect");
-    //   target.disabled = true;
-    // }
+    evaluateInput(value, currentLetterIndex);
+    checkIfLastLetter(target, value, currentLetterIndex, nextInput);
   });
+}
 
-  // function evaluateInput(
-  //   target: HTMLInputElement,
-  //   value: string,
-  //   index: number,
-  //   secretWord: string[],
-  // ) {
-  //   if (value === secretWord[index]) {
-  //     target.classList.add("correct");
-  //     target.disabled = true;
-  //   }
-  //   if (value !== secretWord[index]) {
-  //     target.classList.add("incorrect");
-  //     target.disabled = true;
-  //   }
-  // }
+function checkIfLastLetter(
+  target: HTMLInputElement,
+  value: string,
+  currentLetterIndex: number,
+  nextInput: HTMLInputElement,
+) {
+  if (currentLetterIndex !== secretWord.length - 1) {
+    nextInput.disabled = false;
+    nextInput.focus();
+  } else {
+    console.log("last letter");
+    completeEvaluation();
+    console.log(secretWord);
+  }
+}
+
+function completeEvaluation() {
+  console.log("completeEvaluation", secretWord);
+
+  for (let i = 0; i < secretWord.length; i++) {
+    const currentLetterBlockNumber = i + 1;
+    const currentLetterBlock = document.querySelector(
+      `.letter-block-row-${currentLetterBlockNumber}`,
+    ) as HTMLInputElement;
+
+    console.log(currentLetterBlock);
+
+    const evalValue = secretWord[i].answer;
+
+    if (evalValue === "correct") {
+      setTarget(currentLetterBlock, "correct");
+    }
+
+    if (evalValue === "wrong") {
+      setTarget(currentLetterBlock, "wrong");
+    }
+
+    if (evalValue === "almost") {
+      setTarget(currentLetterBlock, "almost");
+    }
+  }
+
+  function setTarget(target: HTMLElement, validationValue: string) {
+    target.classList.add(`${validationValue}`);
+  }
+}
+
+function evaluateInput(inputValue: string, currentLetterIndex: number) {
+  const currentLetter = secretWord[currentLetterIndex].letter;
+  const answer = secretWord[currentLetterIndex].answer;
+  const itExist = checkExistence(inputValue);
+
+  checkOccurrence(inputValue);
+
+  if (inputValue) {
+    if (inputValue === currentLetter) {
+      secretWord[currentLetterIndex].answer = "correct";
+    }
+    if (inputValue !== currentLetter) {
+      if (itExist) {
+        secretWord[currentLetterIndex].answer = "almost";
+      }
+    }
+  }
+}
+
+function checkExistence(inputValue: string): boolean | void {
+  for (let i = 0; i < secretWord.length; i++) {
+    const letter = secretWord[i].letter;
+
+    if (letter === inputValue) {
+      return true;
+    }
+  }
+}
+
+function checkOccurrence(inputValue: string): number {
+  const occurrences = [];
+
+  for (let i = 0; i < secretWord.length; i++) {
+    if (inputValue === secretWord[i].letter) {
+      occurrences.push(inputValue);
+    }
+  }
+  console.log("occurrences: ", occurrences.length);
+
+  return occurrences.length;
 }

@@ -65,7 +65,7 @@
 }
 
 .letter-block-row {
-  animation: letter-block-anim 1.5s forwards;
+  animation: letter-block-anim 1.5s;
   font-size: 2.1rem;
   display: flex;
   justify-content: center;
@@ -84,9 +84,13 @@
 }
 
 .correct {
-  background: green !important;
+  background: green;
 }
 
-.incorrect {
-  background: red !important;
+.wrong {
+  background: red;
+}
+
+.almost {
+  background: yellow;
 }
