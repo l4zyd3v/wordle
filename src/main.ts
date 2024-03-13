@@ -8,16 +8,17 @@ const letterBlockStartduration = 80;
 
 interface SecretWord {
   letter: string;
-  answer: "correct" | "wrong" | "almost" | false;
+  answer: string;
+  evaluation: "correct" | "wrong" | "almost" | false;
 }
 
-// answer can either be: correct, wrong, almost.
+// evaluation can either be: correct, wrong, almost. starting with false
 var secretWord: SecretWord[] = [
-  { letter: "h", answer: false },
-  { letter: "e", answer: false },
-  { letter: "l", answer: false },
-  { letter: "l", answer: false },
-  { letter: "o", answer: false },
+  { letter: "h", answer: "", evaluation: false },
+  { letter: "e", answer: "", evaluation: false },
+  { letter: "l", answer: "", evaluation: false },
+  { letter: "l", answer: "", evaluation: false },
+  { letter: "o", answer: "", evaluation: false },
 ];
 
 // helper functions
@@ -128,23 +129,25 @@ function disableAllLetterBlocksBesidesFirstOneAndFocus(
 function listenToInput(letterBlock: HTMLInputElement, i: number) {
   letterBlock.addEventListener("input", (e) => {
     const target = e.target as HTMLInputElement;
-    const value = target.value;
+    const inputValue = target.value;
     const currentLetterIndex = i;
     const nextInput = target.nextElementSibling as HTMLInputElement;
 
     // test if the input is a letter otherwise return
-    if (!/^[a-zA-Z]*$/.test(value)) {
+    if (!/^[a-zA-Z]*$/.test(inputValue)) {
       target.value = "";
       return;
     }
-    evaluateInput(value, currentLetterIndex);
-    checkIfLastLetter(target, value, currentLetterIndex, nextInput);
+    insertUserAnswer(inputValue, currentLetterIndex);
+    checkIfLastLetter(currentLetterIndex, nextInput);
   });
 }
 
+function insertUserAnswer(inputValue: string, currentLetterIndex: number) {
+  secretWord[currentLetterIndex].answer = inputValue;
+}
+
 function checkIfLastLetter(
-  target: HTMLInputElement,
-  value: string,
   currentLetterIndex: number,
   nextInput: HTMLInputElement,
 ) {
@@ -154,34 +157,73 @@ function checkIfLastLetter(
   } else {
     console.log("last letter");
     completeEvaluation();
-    console.log(secretWord);
   }
 }
 
 function completeEvaluation() {
   console.log("completeEvaluation", secretWord);
 
+  checkIfCorrect();
+  checkIfAlmost();
+
+  // before locking the answers, check inputs ^^^^
+  // LockAnswers(evalValue, currentLetterBlock);
+}
+
+function checkIfCorrect() {
   for (let i = 0; i < secretWord.length; i++) {
-    const currentLetterBlockNumber = i + 1;
+    const answer = secretWord[i].answer;
+    const letter = secretWord[i].letter;
+
+    if (letter === answer) {
+      secretWord[i].evaluation = "correct";
+    }
+  }
+}
+
+function checkIfAlmost() {
+  for (let i = 0; i < secretWord.length; i++) {
     const currentLetterBlock = document.querySelector(
-      `.letter-block-row-${currentLetterBlockNumber}`,
+      `.letter-block-row-${i + 1}`,
     ) as HTMLInputElement;
+    const currentInputValue = currentLetterBlock.value;
 
-    console.log(currentLetterBlock);
+    const answer = secretWord[i].answer;
+    const secretLetter = secretWord[i].letter;
+    const evaluation = secretWord[i].evaluation;
+    const itExistAndNotYetValued =
+      checkExistenceAndEvaluation(currentInputValue);
+    const occurrence = checkOccurrence(currentInputValue);
 
-    const evalValue = secretWord[i].answer;
+    // console.log(evaluation);
 
-    if (evalValue === "correct") {
-      setTarget(currentLetterBlock, "correct");
+    if (secretLetter !== answer && itExistAndNotYetValued && occurrence === 1) {
+      for (let j = 0; j < secretWord.length; j++) {
+        if (
+          secretWord[j].letter === answer &&
+          secretWord[j].evaluation !== "correct"
+        ) {
+          secretWord[j].evaluation = "almost";
+        }
+      }
     }
+  }
+}
 
-    if (evalValue === "wrong") {
-      setTarget(currentLetterBlock, "wrong");
-    }
+function LockAnswers(
+  evalValue: string | boolean,
+  currentLetterBlock: HTMLInputElement,
+) {
+  if (evalValue === "correct") {
+    setTarget(currentLetterBlock, "correct");
+  }
 
-    if (evalValue === "almost") {
-      setTarget(currentLetterBlock, "almost");
-    }
+  if (evalValue === "wrong") {
+    setTarget(currentLetterBlock, "wrong");
+  }
+
+  if (evalValue === "almost") {
+    setTarget(currentLetterBlock, "almost");
   }
 
   function setTarget(target: HTMLElement, validationValue: string) {
@@ -189,30 +231,12 @@ function completeEvaluation() {
   }
 }
 
-function evaluateInput(inputValue: string, currentLetterIndex: number) {
-  const currentLetter = secretWord[currentLetterIndex].letter;
-  const answer = secretWord[currentLetterIndex].answer;
-  const itExist = checkExistence(inputValue);
-
-  checkOccurrence(inputValue);
-
-  if (inputValue) {
-    if (inputValue === currentLetter) {
-      secretWord[currentLetterIndex].answer = "correct";
-    }
-    if (inputValue !== currentLetter) {
-      if (itExist) {
-        secretWord[currentLetterIndex].answer = "almost";
-      }
-    }
-  }
-}
-
-function checkExistence(inputValue: string): boolean | void {
+function checkExistenceAndEvaluation(inputValue: string): boolean | void {
   for (let i = 0; i < secretWord.length; i++) {
-    const letter = secretWord[i].letter;
+    const secretLetter = secretWord[i].letter;
+    const evaluation = secretWord[i].evaluation;
 
-    if (letter === inputValue) {
+    if ((secretLetter === inputValue && evaluation !== "correct") || "almost") {
       return true;
     }
   }
