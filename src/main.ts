@@ -10,15 +10,24 @@ interface SecretWord {
   letter: string;
   answer: string;
   evaluation: "correct" | "wrong" | "almost" | false;
+  almost_location: number | null;
 }
 
 // evaluation can either be: correct, wrong, almost. starting with false
+// var secretWord: SecretWord[] = [
+//   { letter: "h", answer: "", evaluation: false },
+//   { letter: "e", answer: "", evaluation: false },
+//   { letter: "l", answer: "", evaluation: false },
+//   { letter: "l", answer: "", evaluation: false },
+//   { letter: "o", answer: "", evaluation: false },
+// ];
+
 var secretWord: SecretWord[] = [
-  { letter: "h", answer: "", evaluation: false },
-  { letter: "e", answer: "", evaluation: false },
-  { letter: "l", answer: "", evaluation: false },
-  { letter: "l", answer: "", evaluation: false },
-  { letter: "o", answer: "", evaluation: false },
+  { letter: "h", answer: "", evaluation: false, almost_location: null },
+  { letter: "e", answer: "", evaluation: false, almost_location: null },
+  { letter: "l", answer: "", evaluation: false, almost_location: null },
+  { letter: "l", answer: "", evaluation: false, almost_location: null },
+  { letter: "o", answer: "", evaluation: false, almost_location: null },
 ];
 
 // helper functions
@@ -166,8 +175,15 @@ function completeEvaluation() {
   checkIfCorrect();
   checkIfAlmost();
 
-  // before locking the answers, check inputs ^^^^
-  // LockAnswers(evalValue, currentLetterBlock);
+  for (let i = 0; i < secretWord.length; i++) {
+    const currentLetterBlock = document.querySelector(
+      `.letter-block-row-${i + 1}`,
+    ) as HTMLInputElement;
+    const evalValue = secretWord[i].evaluation;
+    const almostLocation = secretWord[i].almost_location;
+
+    LockAnswers(evalValue, currentLetterBlock, i);
+  }
 }
 
 function checkIfCorrect() {
@@ -195,8 +211,6 @@ function checkIfAlmost() {
       checkExistenceAndEvaluation(currentInputValue);
     const occurrence = checkOccurrence(currentInputValue);
 
-    // console.log(evaluation);
-
     if (secretLetter !== answer && itExistAndNotYetValued && occurrence === 1) {
       for (let j = 0; j < secretWord.length; j++) {
         if (
@@ -204,6 +218,7 @@ function checkIfAlmost() {
           secretWord[j].evaluation !== "correct"
         ) {
           secretWord[j].evaluation = "almost";
+          return (secretWord[j].almost_location = i);
         }
       }
     }
@@ -213,6 +228,8 @@ function checkIfAlmost() {
 function LockAnswers(
   evalValue: string | boolean,
   currentLetterBlock: HTMLInputElement,
+  index: number,
+  almostLocationIndex: number | null,
 ) {
   if (evalValue === "correct") {
     setTarget(currentLetterBlock, "correct");
@@ -223,7 +240,7 @@ function LockAnswers(
   }
 
   if (evalValue === "almost") {
-    setTarget(currentLetterBlock, "almost");
+    console.log("almostLocationIndex", almostLocationIndex);
   }
 
   function setTarget(target: HTMLElement, validationValue: string) {
