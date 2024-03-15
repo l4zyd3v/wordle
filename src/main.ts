@@ -10,24 +10,55 @@ interface SecretWord {
   letter: string;
   answer: string;
   evaluation: "correct" | "wrong" | "almost" | false;
-  almost_location: number | null;
+  almost: { index: number | null; value: boolean | string };
 }
 
-// evaluation can either be: correct, wrong, almost. starting with false
-// var secretWord: SecretWord[] = [
-//   { letter: "h", answer: "", evaluation: false },
-//   { letter: "e", answer: "", evaluation: false },
-//   { letter: "l", answer: "", evaluation: false },
-//   { letter: "l", answer: "", evaluation: false },
-//   { letter: "o", answer: "", evaluation: false },
-// ];
-
 var secretWord: SecretWord[] = [
-  { letter: "h", answer: "", evaluation: false, almost_location: null },
-  { letter: "e", answer: "", evaluation: false, almost_location: null },
-  { letter: "l", answer: "", evaluation: false, almost_location: null },
-  { letter: "l", answer: "", evaluation: false, almost_location: null },
-  { letter: "o", answer: "", evaluation: false, almost_location: null },
+  {
+    letter: "h",
+    answer: "",
+    evaluation: false,
+    almost: {
+      index: null,
+      value: false,
+    },
+  },
+  {
+    letter: "e",
+    answer: "",
+    evaluation: false,
+    almost: {
+      index: null,
+      value: false,
+    },
+  },
+  {
+    letter: "l",
+    answer: "",
+    evaluation: false,
+    almost: {
+      index: null,
+      value: false,
+    },
+  },
+  {
+    letter: "l",
+    answer: "",
+    evaluation: false,
+    almost: {
+      index: null,
+      value: false,
+    },
+  },
+  {
+    letter: "o",
+    answer: "",
+    evaluation: false,
+    almost: {
+      index: null,
+      value: false,
+    },
+  },
 ];
 
 // helper functions
@@ -147,16 +178,16 @@ function listenToInput(letterBlock: HTMLInputElement, i: number) {
       target.value = "";
       return;
     }
-    insertUserAnswer(inputValue, currentLetterIndex);
-    checkIfLastLetter(currentLetterIndex, nextInput);
+    insertUserInput(inputValue, currentLetterIndex);
+    checkIfInputIsLastLetter(currentLetterIndex, nextInput);
   });
 }
 
-function insertUserAnswer(inputValue: string, currentLetterIndex: number) {
+function insertUserInput(inputValue: string, currentLetterIndex: number) {
   secretWord[currentLetterIndex].answer = inputValue;
 }
 
-function checkIfLastLetter(
+function checkIfInputIsLastLetter(
   currentLetterIndex: number,
   nextInput: HTMLInputElement,
 ) {
@@ -174,15 +205,48 @@ function completeEvaluation() {
 
   checkIfCorrect();
   checkIfAlmost();
+  checkIfWrong();
 
+  LockAnswers();
+}
+
+function checkIfWrong() {
   for (let i = 0; i < secretWord.length; i++) {
+    const answer = secretWord[i].answer;
+    const secretLetter = secretWord[i].letter;
+    const evaluation = secretWord[i].evaluation;
+
+    if (answer !== secretLetter && !evaluation) {
+      secretWord[i].evaluation = "wrong";
+    }
+  }
+}
+
+function checkIfAlmost() {
+  for (let i = secretWord.length - 1; i >= 0; i--) {
     const currentLetterBlock = document.querySelector(
       `.letter-block-row-${i + 1}`,
     ) as HTMLInputElement;
-    const evalValue = secretWord[i].evaluation;
-    const almostLocation = secretWord[i].almost_location;
+    const currentInputValue = currentLetterBlock.value;
 
-    LockAnswers(evalValue, currentLetterBlock, i);
+    const answer = secretWord[i].answer;
+    const secretLetter = secretWord[i].letter;
+    const evaluation = secretWord[i].evaluation;
+    const itExistAndNotYetValued =
+      checkExistenceAndEvaluation(currentInputValue);
+    const occurrence = checkOccurrence(currentInputValue);
+
+    if (secretLetter !== answer && itExistAndNotYetValued && occurrence === 1) {
+      for (let j = secretWord.length - 1; j >= 0; j--) {
+        if (
+          secretWord[j].letter === answer &&
+          secretWord[j].evaluation !== "correct"
+        ) {
+          secretWord[j].almost.value = "almost";
+          secretWord[j].almost.index = i;
+        }
+      }
+    }
   }
 }
 
@@ -197,54 +261,35 @@ function checkIfCorrect() {
   }
 }
 
-function checkIfAlmost() {
+function LockAnswers() {
   for (let i = 0; i < secretWord.length; i++) {
     const currentLetterBlock = document.querySelector(
       `.letter-block-row-${i + 1}`,
     ) as HTMLInputElement;
-    const currentInputValue = currentLetterBlock.value;
+    const evalValue = secretWord[i].evaluation;
+    const almostLocation = secretWord[i].almost_location;
 
-    const answer = secretWord[i].answer;
-    const secretLetter = secretWord[i].letter;
-    const evaluation = secretWord[i].evaluation;
-    const itExistAndNotYetValued =
-      checkExistenceAndEvaluation(currentInputValue);
-    const occurrence = checkOccurrence(currentInputValue);
+    if (evalValue === "correct") {
+      setTarget(currentLetterBlock, "correct");
+    }
 
-    if (secretLetter !== answer && itExistAndNotYetValued && occurrence === 1) {
-      for (let j = 0; j < secretWord.length; j++) {
-        if (
-          secretWord[j].letter === answer &&
-          secretWord[j].evaluation !== "correct"
-        ) {
-          secretWord[j].evaluation = "almost";
-          return (secretWord[j].almost_location = i);
-        }
+    if (evalValue === "wrong") {
+      setTarget(currentLetterBlock, "wrong");
+    }
+
+    if (evalValue === "almost") {
+      if (almostLocation !== null) {
+        // almostLocation !== null is to satisfy TS
+        const almostBlock = document.querySelector(
+          `.letter-block-row-${almostLocation + 1}`,
+        ) as HTMLInputElement;
+        almostBlock.classList.add("almost");
       }
     }
-  }
-}
 
-function LockAnswers(
-  evalValue: string | boolean,
-  currentLetterBlock: HTMLInputElement,
-  index: number,
-  almostLocationIndex: number | null,
-) {
-  if (evalValue === "correct") {
-    setTarget(currentLetterBlock, "correct");
-  }
-
-  if (evalValue === "wrong") {
-    setTarget(currentLetterBlock, "wrong");
-  }
-
-  if (evalValue === "almost") {
-    console.log("almostLocationIndex", almostLocationIndex);
-  }
-
-  function setTarget(target: HTMLElement, validationValue: string) {
-    target.classList.add(`${validationValue}`);
+    function setTarget(target: HTMLElement, validationValue: string) {
+      target.classList.add(`${validationValue}`);
+    }
   }
 }
 
@@ -267,7 +312,7 @@ function checkOccurrence(inputValue: string): number {
       occurrences.push(inputValue);
     }
   }
-  console.log("occurrences: ", occurrences.length);
+  // console.log("occurrences: ", occurrences.length);
 
   return occurrences.length;
 }
