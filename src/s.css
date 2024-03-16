@@ -94,3 +94,7 @@
 .almost {
   background: yellow;
 }
+
+.keyboard {
+  border: 2px solid black;
+}

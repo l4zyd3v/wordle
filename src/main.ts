@@ -1,7 +1,7 @@
 import "./s.css";
 
 const app = document.getElementById("app");
-const numberOfRows = 10;
+const numberOfRows = 7;
 const numberOfLetters = 5;
 const rowStartduration = 70;
 const letterBlockStartduration = 80;
@@ -70,6 +70,7 @@ function wait(ms: number) {
 document.addEventListener("DOMContentLoaded", () => {
   initNewGameBoard();
   createHeading();
+  addKeyboard();
 });
 
 // GAMEBOARD CREATION
@@ -165,6 +166,13 @@ function disableAllLetterBlocksBesidesFirstOneAndFocus(
     letterBlock.focus();
   }
 }
+
+function addKeyboard() {
+  const keyboard = document.createElement("div");
+  keyboard.classList.add("keyboard");
+
+  app?.appendChild(keyboard);
+}
 // ----------------------------------------------------------
 function listenToInput(letterBlock: HTMLInputElement, i: number) {
   letterBlock.addEventListener("input", (e) => {
@@ -180,6 +188,9 @@ function listenToInput(letterBlock: HTMLInputElement, i: number) {
     }
     insertUserInput(inputValue, currentLetterIndex);
     checkIfInputIsLastLetter(currentLetterIndex, nextInput);
+
+    //just for test:
+    checkOccurrence(inputValue);
   });
 }
 
@@ -231,15 +242,14 @@ function checkIfAlmost() {
 
     const answer = secretWord[i].answer;
     const secretLetter = secretWord[i].letter;
-    const evaluation = secretWord[i].evaluation;
     const itExistAndNotYetValued =
       checkExistenceAndEvaluation(currentInputValue);
     const occurrence = checkOccurrence(currentInputValue);
 
-    if (secretLetter !== answer && itExistAndNotYetValued && occurrence === 1) {
+    if (answer !== secretLetter && itExistAndNotYetValued) {
       for (let j = secretWord.length - 1; j >= 0; j--) {
         if (
-          secretWord[j].letter === answer &&
+          answer === secretWord[j].letter &&
           secretWord[j].evaluation !== "correct"
         ) {
           secretWord[j].almost.value = "almost";
@@ -267,7 +277,10 @@ function LockAnswers() {
       `.letter-block-row-${i + 1}`,
     ) as HTMLInputElement;
     const evalValue = secretWord[i].evaluation;
-    const almostLocation = secretWord[i].almost_location;
+
+    const almostValue = secretWord[i].almost.value;
+    const almostValueIndex = secretWord[i].almost.index;
+    // const almostLocation = secretWord[i].almost_location;
 
     if (evalValue === "correct") {
       setTarget(currentLetterBlock, "correct");
@@ -277,11 +290,11 @@ function LockAnswers() {
       setTarget(currentLetterBlock, "wrong");
     }
 
-    if (evalValue === "almost") {
-      if (almostLocation !== null) {
+    if (almostValue === "almost") {
+      if (almostValueIndex !== null) {
         // almostLocation !== null is to satisfy TS
         const almostBlock = document.querySelector(
-          `.letter-block-row-${almostLocation + 1}`,
+          `.letter-block-row-${almostValueIndex + 1}`,
         ) as HTMLInputElement;
         almostBlock.classList.add("almost");
       }
@@ -304,6 +317,7 @@ function checkExistenceAndEvaluation(inputValue: string): boolean | void {
   }
 }
 
+// testing to see if I can fit into this function the capability to conclude if a letter which occurs more than; How many times its been evaluated..  badly phrased lol..
 function checkOccurrence(inputValue: string): number {
   const occurrences = [];
 
@@ -312,7 +326,19 @@ function checkOccurrence(inputValue: string): number {
       occurrences.push(inputValue);
     }
   }
-  // console.log("occurrences: ", occurrences.length);
-
+  console.log(`occurrences`, occurrences.length);
   return occurrences.length;
 }
+
+// backup:
+// function checkOccurrence(inputValue: string): number {
+//   const occurrences = [];
+//
+//   for (let i = 0; i < secretWord.length; i++) {
+//     if (inputValue === secretWord[i].letter) {
+//       occurrences.push(inputValue);
+//     }
+//   }
+//
+//   return occurrences.length;
+// }
