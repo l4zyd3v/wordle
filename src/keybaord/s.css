@@ -16,6 +16,10 @@
   justify-content: center;
 }
 
+.keys-anim {
+  animation: key-anim 1.5s forwards;
+}
+
 .keys {
   width: 2.2rem;
   width: 2.2rem;
@@ -25,6 +29,11 @@
   font-size: 1.3rem;
   background: darkslategray;
   text-transform: uppercase;
+  color: darkslategray;
+  transition: 1s;
+}
+
+.transition-text-color {
   color: lightcyan;
 }
 
