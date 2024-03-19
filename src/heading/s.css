@@ -13,7 +13,10 @@
 .heading1 {
   animation: heading-shadow-anim 1s forwards;
   color: lightcoral;
-  font-size: 3.4rem;
-  margin-top: -2rem;
+  font-size: 3.5rem;
+  /* margin-top: -2rem; */
   font-family: protoNerdFont;
+  display: grid;
+  align-items: center;
+  justify-content: center;
 }
