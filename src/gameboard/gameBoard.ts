@@ -6,8 +6,8 @@ import {
   letterBlockStartduration,
 } from "../config/config";
 import wait from "../utils/utils";
-import listenToInput from "../gamelogic/gameLogic"
-import "./s.css"
+import listenToInput from "../gamelogic/gameLogic";
+import "./s.css";
 
 function initNewGameBoard() {
   const gameBoard = document.createElement("div");
