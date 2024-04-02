@@ -1,5 +1,6 @@
 import { app } from "../config/config";
 import { keyRowOne, keyRowTwo, keyRowThree } from "./keyRows";
+import wait from "../utils/utils"
 
 export default function addKeyBoard() {
   const keyBoard = document.createElement("div");
@@ -36,6 +37,10 @@ function addRowToWrappeer(keyRow: string[], wrapper: HTMLDivElement) {
     keyElement.textContent = `${keyName}`;
     keyElement.classList.add(`keys`);
     keyElement.classList.add(`key-${keyName}`);
+
+    wait(Math.floor(Math.random() * 2000)).then(()=> {
+      keyElement.classList.add("transition-text-color");
+    })
 
     wrapper.appendChild(keyElement);
   }
