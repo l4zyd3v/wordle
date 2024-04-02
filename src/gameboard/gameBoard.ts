@@ -6,7 +6,6 @@ import {
   letterBlockStartduration,
 } from "../config/config";
 import wait from "../utils/utils";
-import listenToInput from "../gamelogic/gameLogic";
 import "./s.css";
 
 function initNewGameBoard() {
@@ -69,11 +68,9 @@ function addLetterBlocksToRow(row: HTMLDivElement, numberOfLetters: number) {
       letterBlockNumber,
     );
 
-    wait(letterBlockStartduration * letterBlockNumber)
-      .then(() => row.appendChild(letterBlock))
-      .then(() => {
-        listenToInput(letterBlock, i);
-      });
+    wait(letterBlockStartduration * letterBlockNumber).then(() =>
+      row.appendChild(letterBlock),
+    );
   }
 }
 

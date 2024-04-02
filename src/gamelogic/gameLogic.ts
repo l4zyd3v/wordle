@@ -1,22 +1,15 @@
 import { secretWord } from "../config/secretWord";
 
-function listenToInput(letterBlock: HTMLInputElement, i: number) {
-  letterBlock.addEventListener("input", (e) => {
-    const target = e.target as HTMLInputElement;
-    const inputValue = target.value;
-    const currentLetterIndex = i;
-    const nextInput = target.nextElementSibling as HTMLInputElement;
+function listenToInGameKeyBoardClick(keyBoard: HTMLElement) {
+  console.log("test");
+  keyBoard.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const key = target.textContent;
 
-    // test if the input is a letter otherwise return
-    if (!/^[a-zA-Z]*$/.test(inputValue)) {
-      target.value = "";
-      return;
-    }
-    insertUserInput(inputValue, currentLetterIndex);
-    checkIfInputIsLastLetter(currentLetterIndex, nextInput);
+    console.log("key", key);
 
-    //just for test:
-    checkOccurrence(inputValue);
+    // I need to figure out what the currentLetterIndex is
+    // And I need to make sure that it only listens for buttons input.
   });
 }
 
@@ -169,4 +162,4 @@ function checkOccurrence(inputValue: string): number {
 //   return occurrences.length;
 // }
 
-export default listenToInput;
+export { listenToInGameKeyBoardClick };

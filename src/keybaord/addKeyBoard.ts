@@ -1,8 +1,9 @@
 import { app } from "../config/config";
 import { keyRowOne, keyRowTwo, keyRowThree } from "./keyRows";
-import wait from "../utils/utils"
+import wait from "../utils/utils";
+import { listenToInGameKeyBoardClick } from "../gamelogic/gameLogic";
 
-export default function addKeyBoard() {
+export default async function addKeyBoard() {
   const keyBoard = document.createElement("div");
 
   createKeyWrappers("firstRowWrapper", keyBoard, keyRowOne, "wrapper1");
@@ -11,6 +12,8 @@ export default function addKeyBoard() {
 
   keyBoard.classList.add("keyBoard");
   if (app !== null) app.appendChild(keyBoard);
+
+  listenToInGameKeyBoardClick(keyBoard);
 }
 
 function createKeyWrappers(
@@ -38,9 +41,9 @@ function addRowToWrappeer(keyRow: string[], wrapper: HTMLDivElement) {
     keyElement.classList.add(`keys`);
     keyElement.classList.add(`key-${keyName}`);
 
-    wait(Math.floor(Math.random() * 2000)).then(()=> {
+    wait(Math.floor(Math.random() * 2000)).then(() => {
       keyElement.classList.add("transition-text-color");
-    })
+    });
 
     wrapper.appendChild(keyElement);
   }
