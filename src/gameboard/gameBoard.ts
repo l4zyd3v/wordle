@@ -55,7 +55,7 @@ function createRows(gameBoard: HTMLDivElement, numberOfRows: number) {
 // letter block creation
 function addLetterBlocksToRow(row: HTMLDivElement, numberOfLetters: number) {
   for (let i = 0; i < numberOfLetters; i++) {
-    const letterBlock = document.createElement("input");
+    const letterBlock = document.createElement("div");
     const letterBlockNumber = i + 1;
 
     letterBlock.classList.add(`letter-block-row-${letterBlockNumber}`);

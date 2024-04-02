@@ -66,6 +66,7 @@ body {
   width: 3rem;
   height: 3rem;
   text-align: center;
+  background: white;
 }
 
 .hidden {
