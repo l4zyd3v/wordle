@@ -27,6 +27,7 @@ function createRows(gameBoard: HTMLDivElement, numberOfRows: number) {
     row.classList.add(`row-${rowNumber}`);
     row.classList.add("row");
     row.style.gridTemplateColumns = `repeat(${numberOfLetters}, 1fr)`;
+    row.setAttribute("data-empty", true);
 
     const promise = wait(rowStartduration * rowNumber)
       .then(() => gameBoard.appendChild(row))
@@ -61,6 +62,7 @@ function addLetterBlocksToRow(row: HTMLDivElement, numberOfLetters: number) {
     letterBlock.classList.add(`letter-block-row-${letterBlockNumber}`);
     letterBlock.classList.add("letter-block-row");
     letterBlock.setAttribute("maxlength", "1");
+    letterBlock.setAttribute("data-letter-index", `${i}`);
 
     disableAllLetterBlocksBesidesFirstOneAndFocus(
       letterBlock,
