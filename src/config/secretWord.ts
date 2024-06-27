@@ -1,54 +1,81 @@
 interface SecretWord {
   letter: string;
-  answer: string;
   evaluation: "correct" | "wrong" | "almost" | false;
-  almost: { index: number | null; value: boolean | string };
+  almost_at_index: number | null;
 }
 
 export var secretWord: SecretWord[] = [
   {
     letter: "h",
-    answer: "",
     evaluation: false,
-    almost: {
-      index: null,
-      value: false,
-    },
+    almost_at_index: null,
   },
   {
     letter: "e",
-    answer: "",
     evaluation: false,
-    almost: {
-      index: null,
-      value: false,
-    },
+    almost_at_index: null,
   },
   {
     letter: "l",
-    answer: "",
     evaluation: false,
-    almost: {
-      index: null,
-      value: false,
-    },
+    almost_at_index: null,
   },
   {
     letter: "l",
-    answer: "",
     evaluation: false,
-    almost: {
-      index: null,
-      value: false,
-    },
+    almost_at_index: null,
   },
   {
     letter: "o",
-    answer: "",
     evaluation: false,
-    almost: {
-      index: null,
-      value: false,
-    },
+    almost_at_index: null,
   },
 ];
+
+// export var secretWord: SecretWord[] = [
+//   {
+//     letter: "h",
+//     answer: "",
+//     evaluation: false,
+//     almost: {
+//       index: null,
+//       value: false,
+//     },
+//   },
+//   {
+//     letter: "e",
+//     answer: "",
+//     evaluation: false,
+//     almost: {
+//       index: null,
+//       value: false,
+//     },
+//   },
+//   {
+//     letter: "l",
+//     answer: "",
+//     evaluation: false,
+//     almost: {
+//       index: null,
+//       value: false,
+//     },
+//   },
+//   {
+//     letter: "l",
+//     answer: "",
+//     evaluation: false,
+//     almost: {
+//       index: null,
+//       value: false,
+//     },
+//   },
+//   {
+//     letter: "o",
+//     answer: "",
+//     evaluation: false,
+//     almost: {
+//       index: null,
+//       value: false,
+//     },
+//   },
+// ];

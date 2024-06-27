@@ -1,66 +1,58 @@
-function checkIfRowIsFilled() {
-  const currentRow = getCurrentRow() as HTMLElement;
-  const currentRowChildren = currentRow.childNodes as NodeListOf<HTMLElement>;
-  let blocksThatsNotFilled = [];
+interface Current {
+  row: () => HTMLElement;
+  letterBlock: () => HTMLElement | undefined;
+}
 
-  for (let i = 0; i < currentRowChildren.length; i++) {
-    const currentChild = currentRowChildren[i] as HTMLElement;
+function getCurrent(): Current | undefined {
+  const allRows = Array.from(document.querySelectorAll<HTMLElement>(".row"));
 
-    if (currentChild.textContent === "") {
-      blocksThatsNotFilled.push(currentChild);
+  for (const currentRow of allRows) {
+    if (currentRow.getAttribute("data-empty") === "true") {
+      const letterBlocks = Array.from(currentRow.childNodes);
+
+      const emptyLetterBlock = letterBlocks.find(
+        (block: ChildNode) => block.textContent === "",
+      );
+
+      return {
+        row: () => currentRow as HTMLElement,
+        letterBlock: () => emptyLetterBlock as HTMLElement,
+      };
     }
-  }
-
-  if (blocksThatsNotFilled.length > 0) {
-    return true;
-  } else {
-    return false;
   }
 }
 
-function getLatestFilledLetterBlock() {
-  const currentRow = getCurrentRow() as HTMLElement;
-  const currentRowChildren = currentRow.childNodes as NodeListOf<HTMLElement>;
+function checkIfRowIsFilled(): boolean {
+  const current = getCurrent();
+  if (!current) {
+    throw new Error("No current row found");
+  }
+
+  const currentRowChildren = Array.from(
+    current.row().childNodes as NodeListOf<HTMLElement>,
+  );
+
+  return currentRowChildren.some((child) => child.textContent === "");
+}
+
+function getLatestFilledLetterBlock(): HTMLElement | null {
+  const current = getCurrent();
+  if (!current) {
+    throw new Error("No current row found");
+  }
+
+  const currentRowChildren = Array.from(
+    current.row().childNodes as NodeListOf<HTMLElement>,
+  );
 
   for (let i = currentRowChildren.length - 1; i >= 0; i--) {
-    const currentChildValue = currentRowChildren[i]?.textContent;
-
-    if (currentChildValue !== "") {
+    if (currentRowChildren[i].textContent !== "") {
       return currentRowChildren[i];
     }
   }
+
+  return null;
 }
 
-function getCurrentRow(key?: string) {
-  const rows = document.querySelectorAll(".row");
-
-  for (let i = 0; i < rows.length; i++) {
-    const currentRow = rows[i];
-
-    if (currentRow.getAttribute("data-empty") === "true") {
-      getCurrentLetterBlock(currentRow.childNodes, key);
-
-      return currentRow;
-    }
-  }
-}
-
-// local function(s)
-function getCurrentLetterBlock(
-  letterBlocks: NodeListOf<ChildNode>,
-  key?: string,
-) {
-  for (let i = 0; i < letterBlocks.length; i++) {
-    //O(n^²)
-    const currentLetterBlock = letterBlocks[i] as HTMLElement;
-
-    if (currentLetterBlock.textContent === "") {
-      // console.log(currentLetterBlock);
-      if (key) currentLetterBlock.textContent = key;
-
-      return currentLetterBlock;
-    }
-  }
-}
-
-export { checkIfRowIsFilled, getCurrentRow, getLatestFilledLetterBlock };
+export { checkIfRowIsFilled, getLatestFilledLetterBlock, getCurrent };
+export type { Current };
